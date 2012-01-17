@@ -2,6 +2,7 @@ package virtua.pad;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.TextView;
 import android.hardware.*;
@@ -16,11 +17,13 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
 	private TextView tw;
-    private DatagramSocket udpSocket;
     private Socket tcpSocket;
     int serverPort;
     InetAddress serverAddress;
     private clientState state;
+    private char id;
+    
+    private Handler handler = new Handler();
 	
     /** Called when the activity is first created. */
     @Override
@@ -35,11 +38,11 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     	serverPort = 9999;
     	serverAddress = null;
     	
-		try
+		/*try
     	{
 			serverAddress = InetAddress.getByName("192.168.1.100");
     		
-        	udpSocket = new DatagramSocket();
+        	//udpSocket = new DatagramSocket();
         	
         	tcpSocket = new Socket(serverAddress, serverPort);
         	
@@ -56,7 +59,7 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		
 		
 		
