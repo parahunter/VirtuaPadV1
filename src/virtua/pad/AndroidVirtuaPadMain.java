@@ -18,57 +18,48 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     private Sensor mAccelerometer;
 	private TextView tw;
     private Socket tcpSocket;
-    int serverPort;
-    InetAddress serverAddress;
     private clientState state;
     private char id;
     
+    private int udpServerPort;
+    private int tcpServerPort;
+    private InetAddress serverAddress;
+    
     private Handler handler = new Handler();
+    
 	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) 
     {
     	    	
-        super.onCreate(savedInstanceState);
-        //setContentView(R.layout.main);
-        
-        tw = new TextView(this);
-        tw.setText("blah blah blaaah");
-        state = clientState.disconnected;
-    	serverPort = 9999;
-    	serverAddress = null;
+    	udpServerPort = 40000;
     	
-		/*try
+    	try 
     	{
 			serverAddress = InetAddress.getByName("192.168.1.100");
-    		
-        	//udpSocket = new DatagramSocket();
-        	
-        	tcpSocket = new Socket(serverAddress, serverPort);
-        	
-    	}
-    	catch(SocketException e)
-    	{
-    		Log.e("socket", e.getMessage(), e);
-    	}
-    	catch(UnknownHostException e)
-    	{
-    		Log.e("host", "blah2", e);
-    	} 
-		catch (IOException e) 
-		{
+    	
+	    	tcpServerPort = 50000;
+	    	
+	        super.onCreate(savedInstanceState);
+	        //setContentView(R.layout.main);
+	        
+	        tw = new TextView(this);
+	        tw.setText("blah blah blaaah");
+	        
+	        state = clientState.disconnected;
+	    	
+	    	new Thread(new UDPClient(serverAddress, udpServerPort)).start();		
+			
+	        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+	        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+	                
+	        setContentView(tw);
+        
+		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
-		
-		
-		
-        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-                
-        setContentView(tw);
-        
+		}
     }
     
     protected void onResume() {

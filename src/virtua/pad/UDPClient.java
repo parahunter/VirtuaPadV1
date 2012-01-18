@@ -3,25 +3,33 @@ package virtua.pad;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
+
+import android.util.Log;
 
 public class UDPClient implements Runnable {
 	
-	String SERVERIP = "127.0.0.1";
-	int SERVERPORT = 40000;
-
-	@Override
+	InetAddress serverAddress;
+	
+	int serverPort = 40000;
+	
+	public UDPClient ( InetAddress address, int port) {
+		serverPort = port;
+		serverAddress = address;
+	}
+	
 	public void run() {
-		
+		//Log.v("progress", "start of thread");
 		try {
-			// Get server name
-			InetAddress serverAddr = InetAddress.getByName(SERVERIP);
-			System.out.println("C: Connecting...");
 			
 			// Create UDP socket
 			DatagramSocket socket = new DatagramSocket();
+				
+				
+
 			
 			// Data to send
-			String msgString = "Message number ";
+			String msgString = "Message from Alexander's phone, again: ";
 			int counter = 1;
 			
 			while(true) {
@@ -29,17 +37,30 @@ public class UDPClient implements Runnable {
 				
 				// Create the UDP packet with destination
 				DatagramPacket packet = new DatagramPacket(buf,buf.length,
-						serverAddr,SERVERPORT);
+						serverAddress,serverPort);
 				
+				Log.v("packet message", "trying to send packet");
 				// Send of the packet
 				socket.send(packet);
-				Thread.sleep(1000);
+				Thread.sleep(10);
 				counter += 1;
 			}
 			
-		} catch (Exception e) {
+		}
+		catch(SocketException e)
+		{
+			Log.e("udp error", e.toString());
+		}
+		catch (Exception e) 
+		{
+			Log.e("udp error", e.getMessage());
+			StackTraceElement[] stackTrace= e.getStackTrace();
+			for(StackTraceElement element : stackTrace )
+				Log.e("udp error trace", element.toString());
+			
 			e.printStackTrace();
 		}
+		
 		
 	}
 

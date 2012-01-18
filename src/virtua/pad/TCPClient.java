@@ -5,11 +5,10 @@ import java.io.*;
 
 import android.util.Log;
 
-public class TCPClient extends Thread {
+public class TCPClient implements Runnable {
 	
 	private int serverPort = 50000;
 	private static InetAddress serverAddress;
-	private String host;
 	
 	ObjectInputStream in;
 	ObjectOutputStream out;
@@ -17,19 +16,10 @@ public class TCPClient extends Thread {
 	private Socket tcpSocket;
 	
 	// Constructors
-	public TCPClient () {}
-	public TCPClient (int port) {
+	public TCPClient (int port, InetAddress address) {
 		serverPort = port;
+		serverAddress = address;
 	}
-	public TCPClient (int port, String host) {
-		serverPort = port;
-		this.host = host;
-	}
-	public TCPClient (String host) {
-		this.host = host;
-	}
-
-	@Override
 	public void run() {
 		// TODO Auto-generated method stub
 		setup();
@@ -39,7 +29,6 @@ public class TCPClient extends Thread {
 	
 	public void setup () {
 		try {
-			serverAddress = InetAddress.getByName(host);
 			
 			Log.d("connect","Connecting...");
 			
