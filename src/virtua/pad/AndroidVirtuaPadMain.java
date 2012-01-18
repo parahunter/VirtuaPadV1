@@ -34,6 +34,7 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
         //setContentView(R.layout.main);
         
         tw = new TextView(this);
+        tw.setText("blah blah blaaah");
         state = clientState.disconnected;
     	serverPort = 9999;
     	serverAddress = null;
