@@ -7,7 +7,7 @@ import android.util.Log;
 
 public class TCPClient extends Thread {
 	
-	private int serverPort = 9999;
+	private int serverPort = 50000;
 	private static InetAddress serverAddress;
 	private String host;
 	
