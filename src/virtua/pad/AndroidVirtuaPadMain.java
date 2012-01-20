@@ -19,28 +19,24 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 	private TextView tw;
     private Socket tcpSocket;
     private clientState state;
-    private char id;
+    private byte id;
     
-    private int udpServerPort;
-    private int tcpServerPort;
+    private int udpServerPort = 40000;
+    private int tcpServerPort = 50000;
+    private int tcpCLientPort = 50000;
     private InetAddress serverAddress;
+    private String serverName = "192.168.40.135";
     
     private Handler handler = new Handler();
     
-	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) 
     {
-    	    	
-    	udpServerPort = 40000;
-    	
     	try 
     	{
-			serverAddress = InetAddress.getByName("192.168.1.100");
-    	
-	    	tcpServerPort = 50000;
-	    	
+			serverAddress = InetAddress.getByName(serverName);
+    		
 	        super.onCreate(savedInstanceState);
 	        //setContentView(R.layout.main);
 	        
@@ -49,7 +45,9 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 	        
 	        state = clientState.disconnected;
 	    	
-	    	new Thread(new UDPClient(serverAddress, udpServerPort)).start();		
+	        new Thread(new TCPClient(serverAddress, tcpServerPort, tcpCLientPort)).start();
+	        
+	    	//new Thread(new UDPClient(serverAddress, udpServerPort)).start();		
 			
 	        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
 	        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
