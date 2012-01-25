@@ -9,18 +9,19 @@ import android.util.Log;
 
 public class TCPClient implements Runnable {
 	
-	private int serverPort = 50000;
-	private InetAddress serverAddress;
+	private int serverPort;
+	private InetAddress serverAddress;	
+	private Socket socket;
 	
-	//ObjectInputStream in;
-	//ObjectOutputStream out;
-	//PrintWriter output;
+	private OutputStream out;
+	private InputStream input;
+	private String message;
 	
-	private AndroidVirtuaPadMain mainApp;	
+	private AndroidVirtuaPadMain mainApp;
 	
-	public boolean runThread = true;
+	public boolean runThread = true; // Currently not in use?
 	
-	// Constructors
+	// Constructor
 	public TCPClient (InetAddress address, int portServer, AndroidVirtuaPadMain main) 
 	{
 		serverPort = portServer;
@@ -37,29 +38,19 @@ public class TCPClient implements Runnable {
 		{
 			// Set up the connection
 			Log.d("TCP", "C: Connecting...");
-			Socket socket = new Socket(serverAddress, serverPort);
+			socket = new Socket(serverAddress, serverPort);
 			
 			Log.d("TCP", "C: Connected!");
 			
 			// Request ID
-			String message = "IDRequest";
+			message = "IDRequest";
 			Log.d("TCP", "C: Sending: '" + message + "'");
 		    
-		    OutputStream out = socket.getOutputStream(); 
-		    InputStream input = socket.getInputStream();
+		    out = socket.getOutputStream(); 
+		    input = socket.getInputStream();
 		    out.flush();
 		    
-		    byte[] byteMsg = new byte[message.length() + 1];
-		    byte[] stringBytes = message.getBytes();
-		    
-		    // Prevents byteMsg from being resized.
-		    for(int i = 0 ; i < message.length() ; i++)
-		    	byteMsg[i] = stringBytes[i];
-		    // Terminate it
-		    byteMsg[byteMsg.length - 1] = 0;
-		    
-		    out.write(byteMsg);
-		    out.flush();
+		    sendBytes(message);
 		    
 		    Thread.sleep(5);
 
@@ -92,76 +83,36 @@ public class TCPClient implements Runnable {
 				Log.e("tcp error trace", element.toString());
 		}
 		
-		//setup();
-		//sendMessage("Hello from the TCP client!");
-		
 		return;
 	}
-                                  
-		
-
 	
-	
-	/*public void setup () 
+	/**
+	 * <p>Take a String and convert it
+	 * to a byte array, then send it to
+	 * the server.
+	 * </p>
+	 * @param msg - the String to send.
+	 */
+	private void sendBytes (String msg) 
 	{
-		
-		
+		byte[] byteMsg = new byte[msg.length() + 1];
+	    byte[] stringBytes = msg.getBytes();
+	    
+	    // Prevents byteMsg from being resized.
+	    for(int i = 0 ; i < msg.length() ; i++)
+	    	byteMsg[i] = stringBytes[i];
+	    // Terminate it
+	    byteMsg[byteMsg.length - 1] = 0;
 		try 
 		{
-			
-			Log.d("connect","Connecting...");
-			
-			tcpSocket = new Socket(serverAddress,serverPort);
-			
-			// Get streams
-			try
-			{
-				out = new ObjectOutputStream(tcpSocket.getOutputStream());
-				out.flush();
-				output = new PrintWriter(out);
-			}
-			catch (Exception e)
-			{
-				Log.e("outputStream", e.getMessage());				
-			}
-			
-			in = new ObjectInputStream(tcpSocket.getInputStream());
-			
-		}
-		catch (Exception e) 
-		{
-			// TODO Auto-generated catch block
-			Log.e("TCPClient",e.getMessage());
-		}
-		/*
-		finally 
-		{
-			try 
-			{
-				tcpSocket.close();
-			} 
-			catch (IOException io) 
-			{
-				Log.e("TCPClient","IO");
-			}
-		}*/
-	/*}*/
-	
-	/*private void sendMessage (String msg) 
-	{
-		
-		try 
-		{
-			Log.d("alex", "trying to send");
-			//out.writeObject(msg);
-			output.println("juhhu her er android!");
-			//out.close();
+			out.write(byteMsg);
+			out.flush();
 		} 
 		catch (Exception e) 
 		{
 			Log.e("send", e.getMessage());
 		}
 		
-	}*/
+	}
 
 }
