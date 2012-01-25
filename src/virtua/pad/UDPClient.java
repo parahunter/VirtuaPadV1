@@ -12,10 +12,10 @@ import android.util.Log;
 
 public class UDPClient implements Runnable {
 	
-	InetAddress serverAddress;
+	private InetAddress serverAddress;
 	
-	int serverPort = 40000;
-	AndroidVirtuaPadMain mainApp;
+	private int serverPort = 40000;
+	private AndroidVirtuaPadMain mainApp;
 	
 	public boolean runThread = true;
 	
@@ -36,15 +36,11 @@ public class UDPClient implements Runnable {
 			ByteArrayOutputStream stream = new ByteArrayOutputStream(0);
 			DataOutputStream dataStream = new DataOutputStream(stream);
 			
-			// Data to send
-			
-			
 			while(runThread) 
 			{
 				if(mainApp.getState() == clientState.hasID)
 				{
 					stream.reset();
-					
 					
 					stream.write(mainApp.getID());
 						
