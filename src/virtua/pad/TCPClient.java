@@ -60,7 +60,7 @@ public class TCPClient implements Runnable {
 		    
 		    out.write(byteMsg);
 		    out.flush();
-		    
+		    	
 		    Thread.sleep(5);
 
 		    // Get ID from server
@@ -71,8 +71,8 @@ public class TCPClient implements Runnable {
 		    Log.d("TCP", "response from server " + id);
 		    
 		    // Clean up
-		    out.close();
-		    input.close();
+		    //out.close();
+		    //input.close();
 		    
 		    socket.shutdownOutput();
 		    socket.shutdownInput();

@@ -29,7 +29,7 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     
     private Thread udpThread;
     private TCPClient tcpClient;
-   
+    
     private Thread tcpThread;
     private UDPClient udpClient;
     
