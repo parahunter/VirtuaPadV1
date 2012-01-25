@@ -4,6 +4,9 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.io.*;
+
+import virtua.pad.AndroidVirtuaPadMain.clientState;
 
 import android.util.Log;
 
@@ -12,38 +15,60 @@ public class UDPClient implements Runnable {
 	InetAddress serverAddress;
 	
 	int serverPort = 40000;
+	AndroidVirtuaPadMain mainApp;
 	
-	public UDPClient ( InetAddress address, int port) {
+	public boolean runThread = true;
+	
+	public UDPClient ( InetAddress address, int port, AndroidVirtuaPadMain main) {
 		serverPort = port;
 		serverAddress = address;
+		mainApp = main;
 	}
 	
-	public void run() {
+	public void run() 
+	{
 		//Log.v("progress", "start of thread");
 		try {
 			
 			// Create UDP socket
 			DatagramSocket socket = new DatagramSocket();
-				
-				
-
+			//OutputStream stream = new OutputStream();
+			ByteArrayOutputStream stream = new ByteArrayOutputStream(0);
+			DataOutputStream dataStream = new DataOutputStream(stream);
 			
 			// Data to send
-			String msgString = "Message from Alexander's phone, again: ";
-			int counter = 1;
 			
-			while(true) {
-				byte[] buf = (msgString + counter).getBytes();
+			
+			while(runThread) 
+			{
+				if(mainApp.getState() == clientState.hasID)
+				{
+					stream.reset();
+					
+					
+					stream.write(mainApp.getID());
+						
+					float[] tempAccData = mainApp.getAccData();
+					
+					dataStream.writeFloat(tempAccData[0]);
+					dataStream.writeFloat(tempAccData[1]);
+					dataStream.writeFloat(tempAccData[2]);
+										
+					dataStream.flush();
+					
+					byte[] bytes = stream.toByteArray();
+					
+					Log.v("UDP", "x " + tempAccData[0] + " y " + tempAccData[1] + " z " + tempAccData[2]);
+					
+					// Create the UDP packet with destination
+					DatagramPacket packet = new DatagramPacket(bytes,bytes.length, serverAddress,serverPort);
 				
-				// Create the UDP packet with destination
-				DatagramPacket packet = new DatagramPacket(buf,buf.length,
-						serverAddress,serverPort);
+					Log.v("packet message", "trying to send packet");
+					// Send of the packet
+					socket.send(packet);
+				}
 				
-				Log.v("packet message", "trying to send packet");
-				// Send of the packet
-				socket.send(packet);
-				Thread.sleep(10);
-				counter += 1;
+				Thread.sleep(30);
 			}
 			
 		}

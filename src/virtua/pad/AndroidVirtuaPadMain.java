@@ -12,12 +12,11 @@ import java.net.*;
 
 public class AndroidVirtuaPadMain extends Activity implements SensorEventListener
 {
-	enum clientState{disconnected, tryingToConnect, connected};
+	enum clientState{disconnected, obtainingID, hasID};
 	
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
 	private TextView tw;
-    private Socket tcpSocket;
     private clientState state;
     private byte id;
     
@@ -27,12 +26,20 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     private InetAddress serverAddress;
     private String serverName = "192.168.40.135";
     
-    private Handler handler = new Handler();
+    private float[] accData;
+    
+    private Thread udpThread;
+    private TCPClient tcpClient;
+   
+    private Thread tcpThread;
+    private UDPClient udpClient;
     
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) 
     {
+    	accData = new float[3];
+    	
     	try 
     	{
 			serverAddress = InetAddress.getByName(serverName);
@@ -45,10 +52,14 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 	        
 	        state = clientState.disconnected;
 	    	
-	        new Thread(new TCPClient(serverAddress, tcpServerPort, tcpCLientPort)).start();
+	        tcpClient = new TCPClient(serverAddress, tcpServerPort, tcpCLientPort, this);
+	        tcpThread = new Thread(tcpClient);
+	        tcpThread.start();
 	        
-	    	//new Thread(new UDPClient(serverAddress, udpServerPort)).start();		
-			
+	        udpClient = new UDPClient(serverAddress, udpServerPort, this);
+	    	udpThread = new Thread(udpClient);		
+			udpThread.start();
+	    	
 	        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
 	        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 	                
@@ -60,14 +71,54 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 		}
     }
     
+    public clientState getState()
+    {
+    	return state;
+    }
+    
+    public void setState(clientState newState)
+    {
+    	state = newState;
+    }
+    
+    public void setID(byte newID)
+    {
+    	id = newID;
+    }
+    public byte getID()
+    {
+    	return id;
+    }
+    
     protected void onResume() {
         super.onResume();
+        
+        //udpClient.runThread = true;
+        
+        //udpThread.start();
+        
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
-    protected void onPause() {
+    protected void onPause() 
+    {
+    	
         super.onPause();
+        
+        udpClient.runThread = false;
+        try 
+        {
+			udpThread.join();
+		} 
+        catch (InterruptedException e) 
+        {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
         mSensorManager.unregisterListener(this);
+        
+        //super.finish();
     }
     
 	public void onAccuracyChanged(Sensor sensor, int accuracy) 
@@ -76,31 +127,21 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 		
 	}
 	
+	public float[] getAccData()
+	{
+		return accData;
+	}
+	
 	public void onSensorChanged(SensorEvent event) 
 	{
-		if(state != clientState.connected)
-			return;
+			
+		for(int i = 0 ; i < accData.length ; i++)
+		{
+			accData[i] = event.values[i];
+		}
 		
-    	//int packetLength = 96;
-    	//byte[] data = new byte[packetLength];
-    	
     	tw.setText(event.values[0] + " " + event.values[1] + " " + event.values[2]);
-    	/*        
-        byte[] data = 
-        		
-        DatagramPacket p = new DatagramPacket(message, msg_length,address,port);
-        
-        try 
-        {
-        	//Log.v("UDP send", address.toString() + " " + port);
-        	socket.send(p);
-		} 
-        catch (IOException e) 
-        {
-			// TODO Auto-generated catch block
-			Log.e("UDP", e.getMessage(), e);
-        	e.printStackTrace();
-		}*/
+    	
 	}
 	
 	
