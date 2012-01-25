@@ -10,39 +10,22 @@ import android.util.Log;
 public class TCPClient implements Runnable {
 	
 	private int serverPort = 50000;
-	private int clientPort = 50000;
 	private InetAddress serverAddress;
-	private InetAddress clientAddress;
 	
-	ObjectInputStream in;
-	ObjectOutputStream out;
-	PrintWriter output;
+	//ObjectInputStream in;
+	//ObjectOutputStream out;
+	//PrintWriter output;
 	
-	private Socket tcpSocket;
 	private AndroidVirtuaPadMain mainApp;	
 	
 	public boolean runThread = true;
 	
 	// Constructors
-	public TCPClient (InetAddress address, int portServer, int portClient, AndroidVirtuaPadMain main) 
+	public TCPClient (InetAddress address, int portServer, AndroidVirtuaPadMain main) 
 	{
 		serverPort = portServer;
-		clientPort = portClient;
 		serverAddress = address;
 		mainApp = main;
-		
-		try 
-		{
-			
-			clientAddress = InetAddress.getLocalHost();
-			
-		} 
-		catch (UnknownHostException e) 
-		{
-			Log.e("host", e.getMessage());
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	
 	public void run() 
@@ -50,44 +33,49 @@ public class TCPClient implements Runnable {
 		// TODO Auto-generated method stub
 		Log.d("thread","Thread started");
 		
-		//Socket socket;
 		try
 		{
+			// Set up the connection
 			Log.d("TCP", "C: Connecting...");
-			Socket socket = new Socket(serverAddress, serverPort);//, serverAddress, clientPort);
-			//Socket socket = new Socket(serverAddress,serverPort);
+			Socket socket = new Socket(serverAddress, serverPort);
+			
 			Log.d("TCP", "C: Connected!");
 			
+			// Request ID
 			String message = "IDRequest";
-			
-		    Log.d("TCP", "C: Sending: '" + message + "'");
+			Log.d("TCP", "C: Sending: '" + message + "'");
 		    
 		    OutputStream out = socket.getOutputStream(); 
 		    InputStream input = socket.getInputStream();
-		    //out.flush();
+		    out.flush();
 		    
 		    byte[] byteMsg = new byte[message.length() + 1];
 		    byte[] stringBytes = message.getBytes();
 		    
+		    // Prevents byteMsg from being resized.
 		    for(int i = 0 ; i < message.length() ; i++)
 		    	byteMsg[i] = stringBytes[i];
-		    
+		    // Terminate it
 		    byteMsg[byteMsg.length - 1] = 0;
 		    
 		    out.write(byteMsg);
-		    //out.flush();
-		    //out.println("actual data");
 		    out.flush();
 		    
 		    Thread.sleep(5);
 
+		    // Get ID from server
 		    int id = input.read();
 		    mainApp.setID((byte)id);
 		    mainApp.setState(clientState.hasID);
 		    
 		    Log.d("TCP", "response from server " + id);
 		    
+		    // Clean up
+		    out.close();
+		    input.close();
+		    
 		    socket.shutdownOutput();
+		    socket.shutdownInput();
 		    socket.close();
 		    
 		    Log.d("TCP", "closed connection");
@@ -114,7 +102,7 @@ public class TCPClient implements Runnable {
 
 	
 	
-	public void setup () 
+	/*public void setup () 
 	{
 		
 		
@@ -157,9 +145,9 @@ public class TCPClient implements Runnable {
 				Log.e("TCPClient","IO");
 			}
 		}*/
-	}
+	/*}*/
 	
-	public void sendMessage (String msg) 
+	/*private void sendMessage (String msg) 
 	{
 		
 		try 
@@ -167,7 +155,6 @@ public class TCPClient implements Runnable {
 			Log.d("alex", "trying to send");
 			//out.writeObject(msg);
 			output.println("juhhu her er android!");
-			out.flush();
 			//out.close();
 		} 
 		catch (Exception e) 
@@ -175,6 +162,6 @@ public class TCPClient implements Runnable {
 			Log.e("send", e.getMessage());
 		}
 		
-	}
+	}*/
 
 }

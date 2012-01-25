@@ -22,7 +22,6 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     
     private int udpServerPort = 40000;
     private int tcpServerPort = 50000;
-    private int tcpCLientPort = 50000;
     private InetAddress serverAddress;
     private String serverName = "192.168.40.135";
     
@@ -52,7 +51,7 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 	        
 	        state = clientState.disconnected;
 	    	
-	        tcpClient = new TCPClient(serverAddress, tcpServerPort, tcpCLientPort, this);
+	        tcpClient = new TCPClient(serverAddress, tcpServerPort, this);
 	        tcpThread = new Thread(tcpClient);
 	        tcpThread.start();
 	        
