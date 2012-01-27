@@ -6,13 +6,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.widget.TextView;
 import android.hardware.*;
 
 import java.io.IOException;
 import java.net.*;
 
-public class AndroidVirtuaPadMain extends Activity implements SensorEventListener
+public class AndroidVirtuaPadMain extends Activity implements SensorEventListener, android.view.GestureDetector.OnGestureListener
 {
 	enum clientState{disconnected, obtainingID, hasID};
 	
@@ -28,13 +30,15 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     private String serverName = "192.168.1.100";
     
     private float[] accData;
+    private boolean shooting = false;
     
     private Thread udpThread;
     private TCPClient tcpClient;
     
     private Thread tcpThread;
     private UDPClient udpClient;
-
+    
+    private GestureDetector gestureScanner; // Detects touch events
 
     private PowerManager.WakeLock wakeLock;
     
@@ -54,6 +58,8 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     		
 	        super.onCreate(savedInstanceState);
 	        //setContentView(R.layout.main);
+	        
+	        gestureScanner = new GestureDetector(this);
 	        
 	        tw = new TextView(this);
 	        tw.setText("blah blah blaaah");
@@ -143,6 +149,16 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 		return accData;
 	}
 	
+	public boolean getShooting()
+	{
+		return shooting;
+	}
+	
+	public void setShooting(boolean newShooting)
+	{
+		shooting = newShooting;
+	}
+	
 	public void onSensorChanged(SensorEvent event) 
 	{
 			
@@ -155,5 +171,52 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     	
 	}
 	
+	// TOUCH DETECTION
+	
+	// Make sure to intercept all touch events so we can run our own code.
+	@Override
+	public boolean onTouchEvent(MotionEvent me) {
+		return gestureScanner.onTouchEvent(me);
+	}
+
+	public boolean onDown(MotionEvent arg0) 
+	{
+		Log.d("touch","Touched screen");
+		
+		shooting = true;
+		
+		return true;
+	}
+	
+	public boolean onSingleTapUp(MotionEvent e) {
+		// TODO Auto-generated method stub
+		//Log.d("touch","Released screen");
+		
+		return false;
+	}
+
+	// THINGS WE DON'T CARE ABOUT
+	
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+			float velocityY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public void onLongPress(MotionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+			float distanceY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public void onShowPress(MotionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}	
 	
 }
