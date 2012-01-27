@@ -25,7 +25,7 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     private int udpServerPort = 40000;
     private int tcpServerPort = 50000;
     private InetAddress serverAddress;
-    private String serverName = "192.168.40.135";
+    private String serverName = "192.168.1.100";
     
     private float[] accData;
     
