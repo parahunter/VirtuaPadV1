@@ -1,8 +1,10 @@
 package virtua.pad;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.util.Log;
 import android.widget.TextView;
 import android.hardware.*;
@@ -32,11 +34,18 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     
     private Thread tcpThread;
     private UDPClient udpClient;
+
+
+    private PowerManager.WakeLock wakeLock;
     
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) 
     {
+    	PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+    	wakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
+    	wakeLock.acquire();
+    	
     	accData = new float[3];
     	
     	try 
@@ -92,15 +101,18 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     protected void onResume() {
         super.onResume();
         
+        wakeLock.acquire();
+        
         //udpClient.runThread = true;
         
         //udpThread.start();
         
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_FASTEST );
     }
-
+    
     protected void onPause() 
     {
+    	wakeLock.release();
     	
         super.onPause();
         
