@@ -39,10 +39,12 @@ public class TCPClient implements Runnable {
 			// Set up the connection
 			Log.d("TCP", "C: Connecting...");
 			
+			// Address and port in one object!!!
 			SocketAddress socketAddress = new InetSocketAddress(serverAddress, serverPort);
+			// Unconnected socket :(
 			socket = new Socket();
+			// Connect, but with a timeout
 			socket.connect(socketAddress,5000);
-			//socket = new Socket(serverAddress, serverPort);
 			
 			Log.d("TCP", "C: Connected!");
 			
@@ -94,7 +96,7 @@ public class TCPClient implements Runnable {
 			{
 				public void run() 
 				{
-					mainApp.setDebugView("Could not connect, please try again");
+					mainApp.setDebugText("Could not connect.\nPlease close app and try again.");
 				}
 			});
 		}
@@ -104,7 +106,9 @@ public class TCPClient implements Runnable {
 		}
 		catch (Exception e) 
 		{
+			// We want the class name of the exception so we can add error handling easily.
 			Log.e("TCP", e.getClass().getName());
+			// Print the entire stack trace to LogCat
 			StackTraceElement[] stackTrace= e.getStackTrace();
 			for(StackTraceElement element : stackTrace )
 			{

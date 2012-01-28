@@ -73,7 +73,7 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 	        layout.addView(tw);
 	        
 	        debug = new TextView(this);
-	        debug.setText("Debugging textview");
+	        debug.setText("VirtuaPad");
 	        layout.addView(debug);
 	        
 	        state = clientState.disconnected;
@@ -107,6 +107,11 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     	state = newState;
     }
     
+    /**
+     * <p>Will set the background color
+     * of the entire screen.</p>
+     * @param newColor
+     */
     public void setColor(int newColor)
     {
     	layout.setBackgroundColor(newColor);
@@ -114,9 +119,8 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     public void setID(byte newID)
     {
     	id = newID;
-    	debug.setText("ID: " + id);
     }
-    public void setDebugView(String msg) 
+    public void setDebugText(String msg) 
     {
     	debug.setText(msg);
     }
@@ -143,7 +147,7 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     	
         super.onPause();
         
-        udpClient.runThread = false;
+        /*udpClient.runThread = false;
         try 
         {
 			udpThread.join();
@@ -154,7 +158,7 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 			e.printStackTrace();
 		}
         
-        mSensorManager.unregisterListener(this);
+        mSensorManager.unregisterListener(this);*/
         
         super.finish();
     }
