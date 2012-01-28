@@ -147,7 +147,7 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     	
         super.onPause();
         
-        /*udpClient.runThread = false;
+        udpClient.runThread = false;
         try 
         {
 			udpThread.join();
@@ -158,7 +158,7 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 			e.printStackTrace();
 		}
         
-        mSensorManager.unregisterListener(this);*/
+        mSensorManager.unregisterListener(this);
         
         super.finish();
     }
@@ -169,16 +169,27 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 		
 	}
 	
+	/**
+	 * @return Array of data from the accelerometer
+	 */
 	public float[] getAccData()
 	{
 		return accData;
 	}
 	
+	/**
+	 * 
+	 * @return <code>true</code> if the screen has just been touched
+	 */
 	public boolean getShooting()
 	{
 		return shooting;
 	}
 	
+	/**
+	 * For the purpose of the UDP thread resetting it to false
+	 * @param newShooting
+	 */
 	public void setShooting(boolean newShooting)
 	{
 		shooting = newShooting;
