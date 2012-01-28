@@ -8,7 +8,9 @@ import android.os.PowerManager;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.graphics.Color;
 import android.hardware.*;
 
 import java.io.IOException;
@@ -21,6 +23,7 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
 	private TextView tw;
+	private LinearLayout layout;
     private clientState state;
     private byte id;
     
@@ -61,8 +64,12 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 	        
 	        gestureScanner = new GestureDetector(this);
 	        
+	        layout = new LinearLayout(this);
+	        layout.setOrientation(LinearLayout.VERTICAL);
+	        
 	        tw = new TextView(this);
 	        tw.setText("blah blah blaaah");
+	        layout.addView(tw);
 	        
 	        state = clientState.disconnected;
 	    	
@@ -77,7 +84,7 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 	        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
 	        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 	                
-	        setContentView(tw);
+	        setContentView(layout);
         
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
@@ -95,6 +102,10 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     	state = newState;
     }
     
+    public void setColor(int newColor)
+    {
+    	layout.setBackgroundColor(newColor);
+    }
     public void setID(byte newID)
     {
     	id = newID;

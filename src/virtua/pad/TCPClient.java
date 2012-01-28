@@ -5,6 +5,7 @@ import java.io.*;
 
 import virtua.pad.AndroidVirtuaPadMain.clientState;
 
+import android.graphics.Color;
 import android.util.Log;
 
 public class TCPClient implements Runnable {
@@ -56,6 +57,14 @@ public class TCPClient implements Runnable {
 
 		    // Get ID from server
 		    int id = input.read();
+		    
+		    // Get the color in RGB, convert it to hex and set it
+		    int r = input.read();
+		    int g = input.read();
+		    int b = input.read();
+		    
+		    mainApp.setColor(Color.argb(255, r, g, b));
+		    
 		    mainApp.setID((byte)id);
 		    mainApp.setState(clientState.hasID);
 		    
