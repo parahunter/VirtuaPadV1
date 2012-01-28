@@ -1,22 +1,23 @@
 package virtua.pad;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import android.app.Activity;
 import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.PowerManager;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.graphics.Color;
-import android.hardware.*;
 
-import java.io.IOException;
-import java.net.*;
-
-public class AndroidVirtuaPadMain extends Activity implements SensorEventListener, android.view.GestureDetector.OnGestureListener
+public class AndroidVirtuaPadMain extends Activity implements SensorEventListener, android.view.View.OnTouchListener
 {
 	enum clientState{disconnected, obtainingID, hasID};
 	
@@ -42,8 +43,6 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     private Thread tcpThread;
     private UDPClient udpClient;
     
-    private GestureDetector gestureScanner; // Detects touch events
-
     private PowerManager.WakeLock wakeLock;
     
     /** Called when the activity is first created. */
@@ -63,10 +62,11 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 	        super.onCreate(savedInstanceState);
 	        //setContentView(R.layout.main);
 	        
-	        gestureScanner = new GestureDetector(this);
+	        //gestureScanner = new GestureDetector(this);
 	        
 	        layout = new LinearLayout(this);
 	        layout.setOrientation(LinearLayout.VERTICAL);
+	        layout.setOnTouchListener(this);
 	        
 	        tw = new TextView(this);
 	        tw.setText("blah blah blaaah");
@@ -208,49 +208,20 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 	}
 	
 	// TOUCH DETECTION
-	
-	// Make sure to intercept all touch events so we can run our own code.
-	@Override
-	public boolean onTouchEvent(MotionEvent me) {
-		return gestureScanner.onTouchEvent(me);
-	}
 
-	public boolean onDown(MotionEvent arg0) 
-	{
-		Log.d("touch","Touched screen");
+	public boolean onTouch(View v, MotionEvent event) {
+		int e = event.getAction();
 		
-		shooting = true;
+		if(e == MotionEvent.ACTION_DOWN)
+		{
+			shooting = true;
+		} 
+		else if (e == MotionEvent.ACTION_UP)
+		{
+			shooting = false;
+		}
 		
 		return true;
-	}
-
-	// THINGS WE DON'T CARE ABOUT
-	
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	public boolean onSingleTapUp(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public void onLongPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public void onShowPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
 	}	
 	
 }

@@ -52,12 +52,6 @@ public class UDPClient implements Runnable {
 					
 					// Tell the server if the player is shooting or not
 					dataStream.writeBoolean(mainApp.getShooting());
-					
-					// Only send one shot per touch.
-					if(mainApp.getShooting())
-					{
-						mainApp.setShooting(false);
-					}
 										
 					dataStream.flush();
 					
