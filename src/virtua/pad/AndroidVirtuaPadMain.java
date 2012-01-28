@@ -24,6 +24,7 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     private Sensor mAccelerometer;
 	private TextView tw;
 	private LinearLayout layout;
+	private TextView debug;
     private clientState state;
     private byte id;
     
@@ -71,6 +72,10 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 	        tw.setText("blah blah blaaah");
 	        layout.addView(tw);
 	        
+	        debug = new TextView(this);
+	        debug.setText("Debugging textview");
+	        layout.addView(debug);
+	        
 	        state = clientState.disconnected;
 	    	
 	        tcpClient = new TCPClient(serverAddress, tcpServerPort, this);
@@ -109,6 +114,11 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     public void setID(byte newID)
     {
     	id = newID;
+    	debug.setText("ID: " + id);
+    }
+    public void setDebugView(String msg) 
+    {
+    	debug.setText(msg);
     }
     public byte getID()
     {
@@ -146,7 +156,7 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
         
         mSensorManager.unregisterListener(this);
         
-        //super.finish();
+        super.finish();
     }
     
 	public void onAccuracyChanged(Sensor sensor, int accuracy) 
@@ -198,18 +208,16 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 		
 		return true;
 	}
-	
-	public boolean onSingleTapUp(MotionEvent e) {
-		// TODO Auto-generated method stub
-		//Log.d("touch","Released screen");
-		
-		return false;
-	}
 
 	// THINGS WE DON'T CARE ABOUT
 	
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	public boolean onSingleTapUp(MotionEvent e) {
 		// TODO Auto-generated method stub
 		return false;
 	}

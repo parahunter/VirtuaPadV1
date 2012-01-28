@@ -32,14 +32,17 @@ public class TCPClient implements Runnable {
 	
 	public void run() 
 	{
-		// TODO Auto-generated method stub
 		Log.d("thread","Thread started");
 		
 		try
 		{
 			// Set up the connection
 			Log.d("TCP", "C: Connecting...");
-			socket = new Socket(serverAddress, serverPort);
+			
+			SocketAddress socketAddress = new InetSocketAddress(serverAddress, serverPort);
+			socket = new Socket();
+			socket.connect(socketAddress,5000);
+			//socket = new Socket(serverAddress, serverPort);
 			
 			Log.d("TCP", "C: Connected!");
 			
@@ -59,11 +62,19 @@ public class TCPClient implements Runnable {
 		    int id = input.read();
 		    
 		    // Get the color in RGB, convert it to hex and set it
-		    int r = input.read();
-		    int g = input.read();
-		    int b = input.read();
+		    final int r = input.read();
+		    final int g = input.read();
+		    final int b = input.read();
 		    
-		    mainApp.setColor(Color.argb(255, r, g, b));
+		    mainApp.runOnUiThread(new Runnable () {
+
+				public void run() {
+					// TODO Auto-generated method stub
+					Log.d("color","" + r + ", " + g + ", " + b);
+					mainApp.setColor(Color.argb(255, r, g, b));
+				}
+		    	
+		    });
 		    
 		    mainApp.setID((byte)id);
 		    mainApp.setState(clientState.hasID);
@@ -71,25 +82,34 @@ public class TCPClient implements Runnable {
 		    Log.d("TCP", "response from server " + id);
 		    
 		    // Clean up
-		    //out.close();
-		    //input.close();
-		    
 		    socket.shutdownOutput();
 		    socket.shutdownInput();
 		    socket.close();
 		    
 		    Log.d("TCP", "closed connection");
 		} 
+		catch (SocketTimeoutException e) 
+		{
+			mainApp.runOnUiThread(new Runnable () 
+			{
+				public void run() 
+				{
+					mainApp.setDebugView("Could not connect, please try again");
+				}
+			});
+		}
 		catch (InterruptedException e)
 		{
 			return;
 		}
 		catch (Exception e) 
 		{
-			Log.e("TCP", e.getMessage());
+			Log.e("TCP", e.getClass().getName());
 			StackTraceElement[] stackTrace= e.getStackTrace();
 			for(StackTraceElement element : stackTrace )
+			{
 				Log.e("tcp error trace", element.toString());
+			}
 		}
 		
 		return;
