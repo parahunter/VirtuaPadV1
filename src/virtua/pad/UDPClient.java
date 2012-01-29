@@ -52,6 +52,9 @@ public class UDPClient implements Runnable {
 					
 					// Tell the server if the player is shooting or not
 					dataStream.writeBoolean(mainApp.getShooting());
+					
+					// Tell if the player is shaking the phone
+					dataStream.writeBoolean(mainApp.getShaking());
 										
 					dataStream.flush();
 					

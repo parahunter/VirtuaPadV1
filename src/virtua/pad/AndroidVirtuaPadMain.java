@@ -32,7 +32,7 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     private int udpServerPort = 40000;
     private int tcpServerPort = 50000;
     private InetAddress serverAddress;
-    private String serverName = "192.168.1.100";
+    private String serverName = "192.168.1.101";
     
     private float[] accData;
     private boolean shooting = false;
@@ -44,6 +44,11 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     private UDPClient udpClient;
     
     private PowerManager.WakeLock wakeLock;
+    
+    // For detecting shakes
+    private float mAccelLast;
+    private float mAccelCurrent;
+    private float mAccel;
     
     /** Called when the activity is first created. */
     @Override
@@ -88,6 +93,10 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 	    	
 	        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
 	        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+	        
+	        mAccel = 0.00f;
+	        mAccelCurrent = SensorManager.GRAVITY_EARTH;
+	        mAccelLast = SensorManager.GRAVITY_EARTH;
 	                
 	        setContentView(layout);
         
@@ -127,6 +136,28 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     public byte getID()
     {
     	return id;
+    }
+    
+    protected void onStop ()
+    {
+    	wakeLock.release();
+    	
+        super.onPause();
+        
+        udpClient.runThread = false;
+        try 
+        {
+			udpThread.join();
+		} 
+        catch (InterruptedException e) 
+        {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        mSensorManager.unregisterListener(this);
+        
+        super.onStop();
     }
     
     protected void onResume() {
@@ -178,6 +209,15 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 	}
 	
 	/**
+	 * Tell if the phone is being shaken
+	 * @return <code>true</code> if the phone is moving fast enough
+	 */
+	public boolean getShaking () 
+	{
+		return (mAccel > 2);
+	}
+	
+	/**
 	 * 
 	 * @return <code>true</code> if the screen has just been touched
 	 */
@@ -205,6 +245,14 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 		
     	tw.setText(event.values[0] + " " + event.values[1] + " " + event.values[2]);
     	
+    	// Detect shaking
+    	mAccelLast = mAccelCurrent;
+    	mAccelCurrent = (float) Math.sqrt((double) (accData[0]*accData[0] + 
+    			accData[1]*accData[1] + accData[2]*accData[2]));
+    	float delta = mAccelCurrent - mAccelLast;
+    	mAccel = mAccel * 0.9f + delta;
+    	
+    	//tw.setText("mAccel: " + mAccel);
 	}
 	
 	// TOUCH DETECTION
