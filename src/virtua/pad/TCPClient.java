@@ -63,11 +63,31 @@ public class TCPClient implements Runnable {
 		    // Get ID from server
 		    int id = input.read();
 		    
-		    // Get the color in RGB, convert it to hex and set it
+		    // Get the color in RGB
 		    final int r = input.read();
 		    final int g = input.read();
 		    final int b = input.read();
 		    
+		    // Get team number
+		    final int team_id = input.read();
+		    
+		    mainApp.runOnUiThread(new Runnable ()
+		    {
+
+				public void run() {
+			    	if(team_id == 1)
+				    {
+				    	mainApp.setTeamImage(R.drawable.rick);
+				    }
+				    else if(team_id == 2)
+				    {
+				    	mainApp.setTeamImage(R.drawable.rick2);
+				    }
+					
+				}
+		    });
+		    
+		    // Set color
 		    mainApp.runOnUiThread(new Runnable () {
 
 				public void run() {
@@ -89,16 +109,6 @@ public class TCPClient implements Runnable {
 		    socket.close();
 		    
 		    Log.d("TCP", "closed connection");
-		} 
-		catch (SocketTimeoutException e) 
-		{
-			mainApp.runOnUiThread(new Runnable () 
-			{
-				public void run() 
-				{
-					mainApp.setDebugText("Could not connect.\nPlease close app and try again.");
-				}
-			});
 		}
 		catch (InterruptedException e)
 		{
@@ -114,6 +124,13 @@ public class TCPClient implements Runnable {
 			{
 				Log.e("tcp error trace", element.toString());
 			}
+			mainApp.runOnUiThread(new Runnable () 
+			{
+				public void run() 
+				{
+					mainApp.setDebugText("Could not connect.\nPlease close app and try again.");
+				}
+			});
 		}
 		
 		return;

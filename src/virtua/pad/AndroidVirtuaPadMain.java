@@ -11,9 +11,9 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.PowerManager;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -26,13 +26,23 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 	private TextView tw;
 	private LinearLayout layout;
 	private TextView debug;
+	private ImageView teamImage;
+	
+	// Tutorial stuff
+	private ImageView tutImage;
+	private TextView testTut;
+	private int tut1;
+	private int tut2;
+	private int tut3;
+	private int tutState = 3;
+	
     private clientState state;
     private byte id;
     
     private int udpServerPort = 40000;
     private int tcpServerPort = 50000;
     private InetAddress serverAddress;
-    private String serverName = "192.168.1.101";
+    private String serverName = "192.168.1.115";
     
     private float[] accData;
     private boolean shooting = false;
@@ -65,9 +75,6 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 			serverAddress = InetAddress.getByName(serverName);
     		
 	        super.onCreate(savedInstanceState);
-	        //setContentView(R.layout.main);
-	        
-	        //gestureScanner = new GestureDetector(this);
 	        
 	        layout = new LinearLayout(this);
 	        layout.setOrientation(LinearLayout.VERTICAL);
@@ -81,15 +88,27 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 	        debug.setText("VirtuaPad");
 	        layout.addView(debug);
 	        
+	        tutImage = new ImageView(this);
+	        testTut = new TextView(this);
+	        testTut.setText("test");
+	        testTut.setOnTouchListener(this);
+	        // Set tutorial images:
+	        // tutImage.setImageResource(tut1);
+	        
+	        setContentView(testTut);
+	        
+	        // halt execution
+	        
+	        
 	        state = clientState.disconnected;
 	    	
 	        tcpClient = new TCPClient(serverAddress, tcpServerPort, this);
 	        tcpThread = new Thread(tcpClient);
-	        tcpThread.start();
+	        //tcpThread.start();
 	        
 	        udpClient = new UDPClient(serverAddress, udpServerPort, this);
 	    	udpThread = new Thread(udpClient);		
-			udpThread.start();
+			//udpThread.start();
 	    	
 	        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
 	        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -98,7 +117,7 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 	        mAccelCurrent = SensorManager.GRAVITY_EARTH;
 	        mAccelLast = SensorManager.GRAVITY_EARTH;
 	                
-	        setContentView(layout);
+	        //setContentView(layout);
         
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
@@ -214,7 +233,12 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 	 */
 	public boolean getShaking () 
 	{
-		return (mAccel > 2);
+		return (mAccel > 3);
+	}
+	
+	public void setTeamImage (int resID)
+	{
+		teamImage.setImageResource(resID);
 	}
 	
 	/**
@@ -252,7 +276,7 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
     	float delta = mAccelCurrent - mAccelLast;
     	mAccel = mAccel * 0.9f + delta;
     	
-    	//tw.setText("mAccel: " + mAccel);
+    	//tw.setText((mAccel > 2) + "");
 	}
 	
 	// TOUCH DETECTION
@@ -263,6 +287,18 @@ public class AndroidVirtuaPadMain extends Activity implements SensorEventListene
 		if(e == MotionEvent.ACTION_DOWN)
 		{
 			shooting = true;
+			if(tutState > 0)
+			{
+				testTut.setText("" + tutState);
+				tutState -= 1;
+			}
+			else if(tutState == 0)
+			{
+				tcpThread.start();
+				udpThread.start();
+				tutState -= 1;
+				setContentView(layout);
+			}
 		} 
 		else if (e == MotionEvent.ACTION_UP)
 		{
